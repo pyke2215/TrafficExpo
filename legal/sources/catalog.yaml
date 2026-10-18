@@ -1,0 +1,75 @@
+compiled_on: 2026-10-15
+country: VN
+split_by_country: false
+split_by_locality: false
+split_by_vehicle: true
+current_vehicle: xe_may
+rules: legal/rules/xe_may/phat_hien.md
+purpose: detect_and_classify_violation
+not_for: sanction_amount_or_procedure
+note: >
+  Việt Nam, một bộ luật. Rule chia theo phương tiện. Gói hiện tại là xe máy
+  hai bánh (mô tô và xe gắn máy). Không thay văn bản Công báo và không phải
+  căn cứ xử phạt.
+
+sources:
+  - id: luat-36-2024-qh15
+    title: Luật Trật tự, an toàn giao thông đường bộ
+    number: 36/2024/QH15
+    issuer: Quốc hội
+    issued: 2024-06-27
+    valid_from: 2025-01-01
+    valid_to: null
+    locality: VN
+    used_for: quy tắc giao thông quan sát được, Chương II
+    url: https://xaydungchinhsach.chinhphu.vn/toan-van-luat-trat-tu-an-toan-giao-thong-duong-bo-119240909105718285.htm
+    status: ingested_summary
+
+  - id: luat-118-2025-qh15
+    title: Luật sửa đổi, bổ sung một số điều của 10 luật liên quan đến an ninh, trật tự
+    number: 118/2025/QH15
+    issuer: Quốc hội
+    issued: 2025-12-10
+    valid_from: 2026-07-01
+    valid_to: null
+    locality: VN
+    used_for: sửa khoản 3 Điều 10 Luật 36/2024/QH15; không đổi quy tắc đèn, vạch, biển, tốc độ
+    url: https://vanban.chinhphu.vn/?classid=1&docid=216534&orggroupid=1&pageid=27160
+    status: ingested_delta
+
+  - id: tt-38-2024-bgtvt
+    title: Thông tư quy định tốc độ và khoảng cách an toàn
+    number: 38/2024/TT-BGTVT
+    issuer: Bộ Giao thông vận tải
+    issued: 2024-11-15
+    valid_from: 2025-01-01
+    valid_to: null
+    locality: VN
+    amended_by: 09/2025/TT-BXD
+    amendment_valid_from: 2025-07-01
+    amendment_effect: đổi tên cơ quan có thẩm quyền đặt biển; không đổi trị số tốc độ và khoảng cách
+    url: https://thuvienphapluat.vn/van-ban/Giao-thong-Van-tai/Thong-tu-38-2024-TT-BGTVT-toc-do-khoang-cach-an-toan-xe-co-gioi-tham-gia-giao-thong-duong-bo-622477.aspx
+    consolidated: https://cdn.thuvienphapluat.vn/uploads/Hoidapphapluat/2026/LNMT/Thang_9/260917/74-2026-VBHN-TT-BXD.pdf
+    status: ingested_summary
+
+  - id: qcvn-41-2024-bgtvt
+    title: Quy chuẩn kỹ thuật quốc gia về báo hiệu đường bộ
+    number: QCVN 41:2024/BGTVT
+    issued_by_circular: 51/2024/TT-BGTVT
+    issuer: Bộ Giao thông vận tải
+    issued: 2024-11-15
+    valid_from: 2025-01-01
+    valid_to: null
+    locality: VN
+    replaces: QCVN 41:2019/BGTVT
+    used_for: mã biển, hiệu lực biển, ý nghĩa vạch kẻ, vạch dừng
+    url: https://www.dulieuphapluat.vn/van-ban/tai-nguyen-moi-truong-van-ban/quy-chuan-ky-thuat-quoc-gia-qcvn-412024bgtvt-ve-bao-hieu-duong-bo-1230959.html
+    status: ingested_summary
+
+excluded_sources:
+  - id: nd-168-2024
+    title: Nghị định xử phạt vi phạm hành chính về trật tự, an toàn giao thông đường bộ
+    reason: quy định mức phạt, hình thức xử phạt, trừ điểm. Hành vi đã có trong Luật 36 và văn bản kỹ thuật.
+  - id: nq-56-2026-hdnd-ha-noi
+    title: Nghị quyết mức phạt cao hơn của Hà Nội
+    reason: chỉ đổi mức phạt, không đổi điều kiện xác định vi phạm.

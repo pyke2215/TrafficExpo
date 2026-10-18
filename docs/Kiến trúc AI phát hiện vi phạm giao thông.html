@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kiến trúc AI phát hiện vi phạm giao thông — Mind Map</title>
+<style>
+:root{
+  --bg:#0e1116; --panel:#161b22; --panel2:#1c222b; --line:#2a3240;
+  --ink:#dfe6ee; --ink-dim:#8d9bb0; --accent:#5ee6c8; --accent2:#f0a955;
+  --accent3:#e07a9e; --mono: ui-monospace, "SF Mono", Consolas, "Courier New", monospace;
+  --sans: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:
+    linear-gradient(var(--bg),var(--bg)),
+    repeating-linear-gradient(0deg, rgba(94,230,200,.035) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(94,230,200,.035) 0 1px, transparent 1px 40px);
+  color:var(--ink); font-family:var(--sans); line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){ --bg:#f3f1ea; --panel:#fffdf8; --panel2:#faf7ef; --line:#ddd6c4; --ink:#20242b; --ink-dim:#6b7280; }
+}
+:root[data-theme="dark"]{ --bg:#0e1116; --panel:#161b22; --panel2:#1c222b; --line:#2a3240; --ink:#dfe6ee; --ink-dim:#8d9bb0; }
+
+header{max-width:900px;margin:0 auto;padding:48px 20px 20px}
+h1{font-size:1.7rem;margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--ink-dim);font-size:.95rem;max-width:68ch}
+.toolbar{max-width:900px;margin:18px auto 0;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap}
+button.tool{
+  background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+  padding:8px 14px;border-radius:7px;font-size:.85rem;cursor:pointer;font-family:var(--sans);
+}
+button.tool:hover{border-color:var(--accent)}
+
+main{max-width:900px;margin:0 auto;padding:24px 20px 80px}
+
+details.node{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  margin:10px 0;padding:0 16px;
+}
+details.node[open]{border-color:var(--accent)}
+details.node>summary{
+  cursor:pointer;padding:14px 4px;font-weight:600;font-size:1.02rem;
+  display:flex;align-items:center;gap:10px;list-style:none;
+}
+details.node>summary::-webkit-details-marker{display:none}
+details.node>summary::before{
+  content:"▸"; color:var(--accent); transition:transform .15s; font-size:.8em;
+}
+details.node[open]>summary::before{transform:rotate(90deg)}
+.tag{
+  font-family:var(--mono);font-size:.68rem;padding:2px 7px;border-radius:5px;
+  border:1px solid var(--line);color:var(--ink-dim);font-weight:400;
+}
+.tag.dl{color:var(--accent);border-color:var(--accent)}
+.tag.sym{color:var(--accent2);border-color:var(--accent2)}
+.tag.lang{color:var(--accent3);border-color:var(--accent3)}
+
+.body{padding:2px 4px 16px 24px;color:var(--ink-dim);font-size:.93rem}
+.body p{margin:.4em 0}
+.body ul{margin:.4em 0;padding-left:1.1em}
+.body li{margin:.25em 0}
+
+details.sub{margin:8px 0 8px 0;padding-left:10px;border-left:2px solid var(--line)}
+details.sub>summary{cursor:pointer;color:var(--ink);font-weight:500;font-size:.92rem;padding:6px 0}
+details.sub>summary::before{content:"— "; color:var(--accent2)}
+.flow{font-family:var(--mono);font-size:.82rem;color:var(--accent);margin:6px 0 10px;opacity:.9}
+
+.math{
+  background:var(--panel2);border:1px solid var(--line);border-radius:7px;
+  padding:10px 12px;font-family:var(--mono);font-size:.82rem;color:var(--ink);
+  overflow-x:auto;margin:8px 0;white-space:pre;
+}
+table.k{width:100%;border-collapse:collapse;font-size:.85rem;margin:8px 0}
+table.k th,table.k td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+table.k th{color:var(--ink);background:var(--panel2)}
+
+a.term{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent)}
+a.term:hover{opacity:.8}
+a.ext{color:var(--accent2)}
+a.ext:hover{opacity:.8}
+
+#glossary dt{font-family:var(--mono);color:var(--accent);margin-top:10px;scroll-margin-top:90px}
+#glossary dd{margin:2px 0 0 0;color:var(--ink-dim);font-size:.9rem}
+
+.pill{display:inline-block;margin:2px 4px 2px 0;padding:3px 9px;border-radius:999px;border:1px solid var(--line);font-size:.75rem;color:var(--ink-dim)}
+footer{max-width:900px;margin:0 auto;padding:10px 20px 60px;color:var(--ink-dim);font-size:.8rem}
+:target{animation:flash 1.4s ease-out}
+@keyframes flash{ from{background:rgba(94,230,200,.18)} to{background:transparent} }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kiến trúc AI phát hiện vi phạm giao thông</h1>
+  <div class="sub">Mind map tương tác — perception, scene graph, legal knowledge layer, neuro-symbolic reasoning. Bấm vào tiêu đề để mở/đóng từng phần. <span class="tag dl">DL</span> = dùng deep learning · <span class="tag sym">SYM</span> = thuần toán/logic, không học · <span class="tag lang">LLM</span> = mô hình ngôn ngữ.</div>
+</header>
+
+<div class="toolbar">
+  <button class="tool" onclick="toggleAll(true)">Mở rộng tất cả</button>
+  <button class="tool" onclick="toggleAll(false)">Thu gọn tất cả</button>
+  <button class="tool" onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')">Đổi theme</button>
+</div>
+
+<main>
+
+<details class="node" open>
+<summary>0. Tổng quan luồng 6 lớp</summary>
+<div class="body">
+<div class="flow">Camera → <a class="term" href="#l1">Perception/Scene Graph</a> → <a class="term" href="#grounding">Grounding</a> ⇐ <a class="term" href="#l2">Legal Knowledge Layer</a> ⇐ Văn bản luật</div>
+<div class="flow">Grounding → <a class="term" href="#l3">Neuro-symbolic Reasoning Engine</a> → <a class="term" href="#l4">LLM Explainer</a> → Verdict cho người dùng</div>
+<p>Triết lý cốt lõi: tách <b>neural</b> (chỗ quan hệ chưa biết trước, phải học từ dữ liệu — thị giác, ngôn ngữ) khỏi <b>symbolic</b> (chỗ quan hệ đã biết chính xác — luật), để quyết định pháp lý cuối luôn <a class="term" href="#t-audit">audit được</a>. Toàn bộ hệ còn phải xử lý đúng chiều thời gian thực và cập nhật luật — xem mục 8, lời giải <a class="term" href="#t-validtime">bitemporal</a>. Sau khi tách nhánh nguy cơ (DL) khỏi nhánh kết luận (symbolic), xem sơ đồ module đầy đủ ở <a class="term" href="#split">mục 9</a>, và cách chia client/server ở <a class="term" href="#deploy">mục 10</a>.</p>
+</div>
+</details>
+
+<details class="node" id="l1">
+<summary>1. Perception → Scene Graph <span class="tag dl">DL</span></summary>
+<div class="body">
+<p>Biến video thô thành <a class="term" href="#t-scenegraph">scene graph</a> có cấu trúc: objects[], static_elements[] (biển báo/vạch), relations[] (quan hệ không gian-thời gian).</p>
+
+<details class="sub"><summary>Backbone detector <span class="tag dl">DL</span></summary>
+<div class="body"><p>CNN/Transformer thị giác (YOLO, DETR) + segmentation cho vạch kẻ. Phát hiện object, biển báo, vạch, xuất bbox + class.</p></div>
+</details>
+
+<details class="sub"><summary>Multi-object tracker <span class="tag dl">DL</span></summary>
+<div class="body"><p>ByteTrack/DeepSORT — mạng re-identification embedding gán ID xuyên frame, tính quỹ đạo và vận tốc.</p></div>
+</details>
+
+<details class="sub"><summary>📷 Self info vs context — theo loại camera</summary>
+<div class="body">
+<p>Camera gắn trên xe/kính/điện thoại + app biết trước biển số, loại xe, tài xế → <b>self không cần detect</b>, inject thẳng vào belief vector <code>x(t)</code>, bỏ qua perception cho riêng phần này. Camera cố định (roadside) vẫn phải detect + track <i>mọi</i> xe qua, kể cả việc xác định "xe nào đang quan tâm".</p>
+<table class="k">
+<tr><th></th><th>Camera cố định</th><th>Camera trên người dùng</th></tr>
+<tr><td>Automaton cho</td><td>mọi xe qua (nhiều instance)</td><td>chủ yếu self (ít, dài hơi)</td></tr>
+<tr><td>Zone-exit check</td><td>suy luận từ pixel</td><td>so toạ độ GPS — rẻ, chắc hơn</td></tr>
+<tr><td><code>is_emergency_vehicle(self)</code></td><td>LLM visual-check, confidence thấp</td><td>fact từ đăng ký xe, chắc chắn</td></tr>
+</table>
+</div>
+</details>
+
+<details class="sub"><summary>Relation head (GNN + attention) <span class="tag dl">DL</span></summary>
+<div class="body"><p>Message-passing giữa node/edge để dự đoán quan hệ (vd "crossed", "within_zone_of") — cần vì dự đoán cục bộ từng cặp bỏ qua ngữ cảnh xung quanh, còn suy luận đồng thời giải quyết được sự mơ hồ đó.</p>
+<p>Agentic alternative hiện đại: để scene graph nằm trong graph DB (Neo4j), LLM phát <a class="term" href="#t-cypher">truy vấn Cypher</a> thay vì đọc caption — xem <a class="ext" href="https://arxiv.org/abs/2604.03697" target="_blank">SGTA (arXiv 2604.03697)</a>.</p></div>
+</details>
+
+<div class="math">{
+  "objects":[{"id":"v1","track":[{"t":40.0,"x":12.3,"lane":"L2"}]}],
+  "static_elements":[{"id":"line_1","type":"lane_marking","style":"solid"}],
+  "relations":[{"subject":"v1","predicate":"crossed","object":"line_1","t":42.3}]
+}</div>
+
+<details class="sub"><summary>⏱ Realtime: temporal graph, không phải batch</summary>
+<div class="body">
+<p>Mỗi node/edge mang <a class="term" href="#t-validtime">valid_time</a> riêng (vd <code>speed_limit(zone_5,60,valid=[t1,t2])</code>) — context thay đổi khi xe di chuyển chỉ là tra lọc theo khoảng hiệu lực, không phải suy luận lại.</p>
+<p><a class="term" href="#t-ttl">TTL/sliding window</a> loại bỏ thực thể quá cũ khỏi graph đang hoạt động, tránh phình bộ nhớ.</p>
+<p>Automaton được <b>instance hoá theo từng cặp (xe, rule)</b> — tạo khi xe vào vùng áp dụng, huỷ/archive khi rời vùng hoặc rule đã resolve — không phải một graph toàn cục duy nhất.</p>
+</div>
+</details>
+</div>
+</details>
+
+<details class="node" id="l2">
+<summary>2. Legal Knowledge Layer <span class="tag sym">compiled offline</span></summary>
+<div class="body">
+<p>Biến văn bản luật thành <a class="term" href="#t-dcl">logic tính toán được</a> — <b>chạy một lần</b> khi luật thay đổi, không phải mỗi request.</p>
+
+<details class="sub"><summary>Document parser / chunker</summary><div class="body"><p>Tách theo điều, khoản, điểm.</p></div></details>
+<details class="sub"><summary>Semantic role extraction <span class="tag lang">LLM hỗ trợ, 1 lần</span></summary><div class="body"><p>Xác định chủ thể, hành vi, điều kiện, ngoại lệ — theo pipeline 4 bước kiểu S4L (trích xuất vai trò → hoàn thiện ngữ cảnh → ánh xạ logic → định dạng).</p></div></details>
+<details class="sub"><summary>Logic formalizer</summary><div class="body"><p>Sinh rule Prolog/ASP với <a class="term" href="#t-ddl">deontic modal</a> (nghĩa vụ/cấm/miễn trừ):</p>
+<div class="math">violation(overtaking, V) :-
+    crossed(V, solid_line, T),
+    within_zone_of(V, sign(no_overtake), T),
+    not exception(emergency_vehicle, V).</div></div></details>
+<details class="sub"><summary>Conflict / priority resolver</summary><div class="body"><p>Gán quan hệ ưu tiên (<a class="term" href="#t-superiority">superiority relation</a>) giữa các rule xung đột — hiện thực hoá nguyên tắc <i>lex specialis derogat legi generali</i>.</p>
+<p><b>Phát hiện overlap tự động</b> bằng chính ma trận <code>A</code>, chạy như một gate khi deploy rule mới:</p>
+<div class="math">C = Aᵀ·A     // C[i,j] = số predicate chung giữa rule i, j
+for (i,j) với C[i,j] > 0:
+    nếu antecedent_j ⊆ antecedent_i → SUBSUMPTION (cần priority)
+    nếu cùng mô tả 1 hành vi         → CONFLICTING (cần priority)
+    else                             → COMPATIBLE  (không cần)
+    nếu cần priority mà M[i,j]=M[j,i]=0 → chặn deploy, báo luật sư</div>
+</div></details>
+<details class="sub"><summary>Human validation + KG builder</summary><div class="body"><p>Luật sư review trước khi ghi triples vào knowledge graph — bắt buộc, không tuỳ chọn.</p></div></details>
+<details class="sub"><summary>⏱ Cập nhật luật: rule tuple mang theo thời gian</summary>
+<div class="body">
+<div class="math">r_j = ( φ_j, ℓ_j, E_j, τ_j,
+        valid_from, valid_to,     ← ngày luật có hiệu lực pháp lý
+        transaction_time )        ← ngày hệ thống ghi nhận bản vá</div>
+<p>Vi phạm tại thời điểm <i>t</i> được xét theo rule có <code>valid_from ≤ t &lt; valid_to</code> — không dùng luật mới nhất cho vụ việc cũ.</p>
+<p>Thêm rule mới = vá cục bộ vào mạng đã biên dịch (thuộc tính incremental của Rete), kèm 2 bước bắt buộc: khai báo quan hệ ưu tiên với mọi rule giao nhau predicate, và chạy regression test trên case lịch sử đã có verdict chuẩn trước khi deploy.</p>
+</div>
+</details>
+</div>
+</details>
+
+<details class="node">
+<summary>3. Biên dịch thành 5 cấu trúc toán học <span class="tag sym">compile-time</span></summary>
+<div class="body">
+<table class="k">
+<tr><th>Ký hiệu</th><th>Dạng toán học</th><th>Vai trò</th></tr>
+<tr><td><code>P</code></td><td>Tập hợp</td><td>từ vựng predicate chung</td></tr>
+<tr><td><code>A</code></td><td>Ma trận predicate×rule</td><td>lọc rule ứng viên (<a class="term" href="#t-alpha">alpha match</a>)</td></tr>
+<tr><td><code>f_j(x)</code></td><td>Hàm/circuit (×,+)</td><td>tính xác suất vi phạm</td></tr>
+<tr><td><code>Automaton_j</code></td><td>Máy trạng thái hữu hạn</td><td>xử lý thứ tự thời gian</td></tr>
+<tr><td><code>M</code></td><td>Ma trận quan hệ thứ tự</td><td>giải xung đột đa-rule</td></tr>
+</table>
+<p>Cơ chế biên dịch rule→network để tránh quét lại toàn bộ rule base mỗi sự kiện bắt nguồn từ <a class="ext" href="https://en.wikipedia.org/wiki/Rete_algorithm" target="_blank">thuật toán Rete</a> (Forgy, 1970s): compile-time dựng discrimination network, runtime chỉ lan truyền thay đổi. Rete chỉ là một lựa chọn engine — có thể thay bằng Datalog/ASP/SMT, xem <a class="term" href="#split">mục 9</a>.</p>
+</div>
+</details>
+
+<details class="node" id="grounding">
+<summary>4. Grounding / Alignment</summary>
+<div class="body"><p>Unification engine: khớp predicate name + type + time-window giữa scene graph và tiền đề luật. Không dùng similarity ngôn ngữ mờ — trừ fallback.</p>
+<details class="sub"><summary>Fallback khi không khớp chính xác <span class="tag dl">DL</span></summary><div class="body"><p>Embedding model (KG/sentence embedding) tìm predicate luật gần nhất — luôn gắn cờ "cần review", không tự ra verdict.</p></div></details>
+</div>
+</details>
+
+<details class="node" id="l3">
+<summary>5. Neuro-symbolic Reasoning Engine</summary>
+<div class="body">
+<details class="sub"><summary>Fact ingestion</summary><div class="body"><p>Nạp belief vector <code>x(t) ∈ [0,1]ⁿ</code> từ sự kiện scene graph.</p></div></details>
+<details class="sub"><summary>LLM fact-completion agent <span class="tag lang">LLM</span></summary><div class="body"><p>Suy luận predicate còn thiếu mà rule hình học không tự xác định được (vd nhận diện xe ưu tiên qua hình ảnh).</p></div></details>
+<details class="sub"><summary>Symbolic solver (ASP/Prolog) <span class="tag sym">SYM</span></summary><div class="body"><p>Giải model thoả rule + fact — deterministic, audit được.</p></div></details>
+<details class="sub"><summary>Defeasible conflict resolver <span class="tag sym">SYM</span></summary><div class="body"><p>Áp ma trận <code>M</code>: loại rule bị đè dù xác suất cao hơn.</p></div></details>
+<details class="sub"><summary>⏱ Vòng đời automaton instance</summary><div class="body">
+<p>Mỗi instance (subject, rule) có 3 trigger archive — hai đầu deterministic (thuộc chính δ), một mang tính heuristic:</p>
+<div class="math">① state ∈ TERMINAL        → archive ngay, emit verdict nếu accept
+② ra khỏi geofence chưa đủ điều kiện → archive "incomplete"
+③ idle = now − last_seen_t &gt; TTL  → archive "tracking_lost"</div>
+<p>Với camera ego, ② dùng GPS app cung cấp (so toạ độ) thay vì suy luận pixel — rẻ và chắc hơn; ③ hiếm khi cần cho self vì self luôn "trong khung hình" (camera gắn trên chính nó).</p>
+</div></details>
+
+<p><b>Ví dụ số đầy đủ</b> (R1 cụ thể "cấm vượt" ≻ R2 chung "sai làn"):</p>
+<div class="math">x = [p1=0.97, p2=0.99, p3=0.12]   (p3 = là xe ưu tiên?)
+
+Alpha match:  match[R1]=2=|R1| ✓   match[R2]=1=|R2| ✓
+Circuit:      f_R1 = p1·p2·(1-p3) ≈ 0.845
+              f_R2 = p1·(1-p3)    ≈ 0.854
+Priority:     M[R1,R2]=1 → loại R2 dù f_R2 cao hơn
+Verdict:      R1, confidence 0.845</div>
+
+<p>Trường phái hiện đại — <a class="term" href="#t-circuit">differentiable circuit</a>: thay vì fact nhị phân, lan truyền <i>xác suất</i> qua circuit bằng <a class="term" href="#t-semiring">provenance semiring</a>, cho phép gradient từ lỗi verdict lan ngược về tận trọng số backbone detector để huấn luyện đầu-cuối. Xem <a class="ext" href="https://arxiv.org/abs/2304.04812" target="_blank">Scallop (arXiv 2304.04812)</a>.</p>
+</div>
+</details>
+
+<details class="node" id="l4">
+<summary>6. LLM Explainer <span class="tag lang">LLM</span></summary>
+<div class="body"><p>Generation có ràng buộc: đọc verdict JSON + evidence_trail, sinh giải thích ngôn ngữ tự nhiên kèm trích dẫn điều luật. Guardrail đảm bảo không thêm fact ngoài evidence_trail.</p></div>
+</details>
+
+<details class="node">
+<summary>7. Phân vùng Neural vs Symbolic</summary>
+<div class="body">
+<p><b>Cần Neural</b> (quan hệ chưa biết trước): backbone + tracker, GNN quan hệ, grounding fallback, LLM explainer.</p>
+<p><b>Chỉ Symbolic</b> (quan hệ đã biết từ luật): legal KG, alpha match, automaton, conflict resolver.</p>
+<p>Không nên nén luật vào attention/mạng học — Kautz phân loại nhiều mức tích hợp neuro-symbolic (Symbolic[Neuro] → Neuro:Symbolic→Neuro); mức càng chặt càng khó audit. Compliance team audit được một rule đang fire trong lớp symbolic, không audit được quyết định của mô hình hộp đen.</p>
+</div>
+</details>
+
+<details class="node">
+<summary>8. Realtime &amp; cập nhật luật — lời giải chung: bitemporal <span class="tag sym">SYM</span></summary>
+<div class="body">
+<p>Hai vấn đề tưởng khác nhau — ngữ cảnh thị giác đổi liên tục, và luật được sửa đổi theo thời gian — thực ra cùng một bài toán database kinh điển: mỗi dữ kiện cần 2 trục thời gian tách biệt.</p>
+<table class="k">
+<tr><th>Trục</th><th>Ý nghĩa</th><th>Áp dụng cho scene graph</th><th>Áp dụng cho luật</th></tr>
+<tr><td><a class="term" href="#t-validtime">valid_time</a></td><td>Khi nào đúng ngoài đời</td><td>Biển/zone/đèn đang hiệu lực tại chỗ</td><td>Ngày điều luật có hiệu lực pháp lý</td></tr>
+<tr><td><a class="term" href="#t-txtime">transaction_time</a></td><td>Khi hệ thống ghi nhận</td><td>Lúc perception detect được</td><td>Lúc hệ thống cập nhật bản vá rule</td></tr>
+</table>
+<p><b>Khả thi hình thức hoá "toàn bộ luật một lần"?</b> Không, và không cần — rollout theo độ phủ (ưu tiên case phổ biến/rõ ràng trước), predicate/case chưa hình thức hoá luôn escalate cho người thay vì mặc định "không vi phạm".</p>
+</div>
+</details>
+
+<details class="node" id="split">
+<summary>9. Kiến trúc sau khi tách nhánh <span class="tag dl">A: DL</span> <span class="tag sym">B: SYM</span></summary>
+<div class="body">
+<div class="flow">Camera → Perception (DL) → Scene graph (time) ⇒ Belief vector x(t) ⇐ App self info (inject)</div>
+<div class="flow">x(t) ⇒ <b>A</b> Risk predictor → Risk score ┐</div>
+<div class="flow">x(t) ⇒ <b>B</b> Grounding → Automaton + circuit → Priority resolver → Verdict ┤→ LLM explainer → Output</div>
+<div class="flow">Văn bản luật ⇒ Parser/LLM → Overlap gate + test → Rule compiler → Compiled package ⇒ B</div>
+
+<details class="sub"><summary>Dùng chung <span class="tag dl">DL</span></summary><div class="body"><p>Perception (detect, track, GNN quan hệ) → scene graph có <a class="term" href="#t-validtime">valid_time</a>/TTL. Hợp với self info từ app (xe, tài xế, GPS/IMU) thành belief vector <code>x(t)</code>; self được inject, không detect.</p></div></details>
+<details class="sub"><summary>Nhánh A — nguy cơ <span class="tag dl">DL</span></summary><div class="body"><p>Risk predictor (dự đoán quỹ đạo/VLM) → risk score xác suất. Phục vụ cảnh báo sớm, chấp nhận sai số, <b>không</b> làm căn cứ xử phạt.</p></div></details>
+<details class="sub"><summary>Nhánh B — kết luận vi phạm <span class="tag sym">SYM</span></summary><div class="body"><p>Grounding → automaton + circuit <code>f_j(x)</code> → priority resolver (ma trận <code>M</code>) → verdict. Không có trọng số học được, audit được từng phép tính.</p></div></details>
+<details class="sub"><summary>Offline — biên dịch luật <span class="tag lang">người + LLM</span></summary><div class="body"><p>Parser + LLM soạn rule (luật sư review) → overlap gate + regression test → rule compiler (version bitemporal) → compiled package cấp cho nhánh B. Human review phản hồi về luật và nhãn huấn luyện.</p></div></details>
+<details class="sub"><summary>LLM explainer / composer <span class="tag lang">LLM</span></summary><div class="body"><p>Gộp cảnh báo sớm (A) + kết luận (B) + chỉ dẫn; chỉ diễn đạt lại kết quả đã có, không thêm fact.</p></div></details>
+
+<p><b>Chọn engine cho nhánh B</b> — Rete chỉ là một lựa chọn, không phải cốt lõi; cốt lõi là symbolic, biên dịch sẵn, deterministic, audit được:</p>
+<table class="k">
+<tr><th>Engine</th><th>Hợp khi</th></tr>
+<tr><td>Rete / rule engine</td><td>Nhiều rule, fact đổi liên tục, cần incremental</td></tr>
+<tr><td>Datalog</td><td>Quan hệ đệ quy, suy diễn trên graph lớn</td></tr>
+<tr><td>ASP (Clingo)</td><td>Ngoại lệ, mặc định, xung đột (defeasible)</td></tr>
+<tr><td>SMT (Z3)</td><td>Ràng buộc số học (tốc độ, khoảng cách) cần chứng minh</td></tr>
+<tr><td>Circuit khả vi (Scallop)</td><td>Muốn train đầu-cuối qua phần luật</td></tr>
+</table>
+<p>Cơ sở: các nghiên cứu 2026 về luật thuế cho thấy hệ lai LLM + solver symbolic đáng tin và tổng quát hoá tốt hơn LLM nguyên khối — lưu ý bằng chứng này đến từ luật thuế, chưa phải luật giao thông kèm thị giác. Xem <a class="ext" href="https://arxiv.org/abs/2508.21051" target="_blank">Language Models and Logic Programs for Trustworthy Tax Reasoning (arXiv 2508.21051)</a>.</p>
+</div>
+</details>
+
+<details class="node" id="deploy">
+<summary>10. Triển khai client / server</summary>
+<div class="body">
+<p><b>Quy tắc:</b> cái gì cần ngay và an toàn thì ở client; cái gì nặng, tập trung hoặc cần kiểm toán thì ở server. Mọi đường cảnh báo tới hạn không được phụ thuộc mạng.</p>
+<details class="sub"><summary>Client (điện thoại / kính AR) <span class="tag dl">DL nhẹ</span> <span class="tag sym">SYM</span></summary><div class="body">
+<p>Capture + self info (camera, GPS/IMU, hồ sơ xe) → perception ra scene graph (model nhẹ trên NPU) → <b>runtime nhánh B</b> (automaton, circuit, ma trận <code>M</code>) → risk nhẹ + cảnh báo tại chỗ bằng template → log ký số (verdict + version rule + hash bằng chứng).</p>
+<p>Compiled package nhỏ nên tải về máy được: chạy offline, latency thấp, dữ liệu thô không rời thiết bị. Client chọn package theo <code>valid_from/valid_to</code> kể cả khi offline.</p>
+</div></details>
+<details class="sub"><summary>Server <span class="tag lang">LLM</span></summary><div class="body">
+<p>Biên dịch luật (parser, overlap gate, regression test) → package registry có version bitemporal → phát hành xuống client. LLM explainer và soạn rule gọi bất đồng bộ. Audit log + huấn luyện lại / active learning từ dữ liệu client gửi lên.</p>
+</div></details>
+<details class="sub"><summary>Luồng đồng bộ</summary><div class="body">
+<div class="math">server → client : package luật (versioned)
+client → server : scene graph / verdict + hash (async)
+client ⇄ server : yêu cầu giải thích LLM (async)</div>
+<p>Gửi scene graph (vài KB có cấu trúc) thay vì video giúp tiết kiệm băng thông và bảo vệ quyền riêng tư người xung quanh.</p>
+</div></details>
+<details class="sub"><summary>Điểm cần cẩn trọng</summary><div class="body">
+<ul>
+<li><b>Sức mạnh thiết bị:</b> detect/track/GNN trên điện thoại có NPU khả thi; kính AR rất tuỳ máy (nhiệt, pin). Cần đo thực tế; nếu GNN quá nặng, dùng quan hệ hình học trên máy và để server tinh chỉnh.</li>
+<li><b>Bằng chứng pháp lý:</b> ghi version rule, đầu vào và hash bằng chứng, ký số rồi đồng bộ.</li>
+<li><b>Đồng bộ version:</b> client tự cập nhật package khi có mạng.</li>
+</ul>
+</div></details>
+</div>
+</details>
+
+<details class="node">
+<summary>📖 Thuật ngữ</summary>
+<div class="body">
+<dl id="glossary">
+<dt id="t-scenegraph">Scene graph</dt><dd>Biểu diễn đồ thị: object/biển báo/vạch là node, quan hệ không gian-thời gian là edge.</dd>
+<dt id="t-dcl">Logic tính toán được (computable law)</dt><dd>Luật được hình thức hoá thành predicate/rule máy xử lý được, thay vì chỉ là văn bản.</dd>
+<dt id="t-ddl">Defeasible Deontic Logic</dt><dd>Logic mô hình nghĩa vụ/cấm/cho phép, có cơ chế xử lý ngoại lệ và xung đột giữa các luật.</dd>
+<dt id="t-superiority">Superiority relation</dt><dd>Quan hệ ưu tiên giữa hai rule xung đột — rule nào thắng khi cả hai cùng fire.</dd>
+<dt id="t-alpha">Alpha match</dt><dd>Bước lọc nhanh rule ứng viên bằng cách tra ma trận/mạng đã biên dịch, không quét toàn bộ rule base.</dd>
+<dt id="t-cypher">Truy vấn Cypher</dt><dd>Ngôn ngữ truy vấn đồ thị (Neo4j) — agent dùng để duyệt scene graph thay vì đọc text thô.</dd>
+<dt id="t-circuit">Arithmetic / probabilistic circuit</dt><dd>Mạch tính gồm cổng nhân/cộng, biên dịch từ công thức logic, nhận xác suất predicate làm input.</dd>
+<dt id="t-semiring">Provenance semiring</dt><dd>Khung đại số cho phép lan truyền xác suất/gradient xuyên một chương trình logic.</dd>
+<dt id="t-audit">Audit được</dt><dd>Có thể lần lại từng bước suy luận dẫn đến quyết định cuối — yêu cầu bắt buộc cho quyết định pháp lý.</dd>
+<dt id="t-validtime">valid_time</dt><dd>Khoảng thời gian một dữ kiện/quy định thực sự đúng ngoài đời (không phải lúc hệ thống biết về nó).</dd>
+<dt id="t-txtime">transaction_time</dt><dd>Thời điểm hệ thống ghi nhận/cập nhật một dữ kiện — trục thời gian thứ hai trong mô hình bitemporal.</dd>
+<dt id="t-ttl">TTL / sliding window</dt><dd>Cơ chế loại bỏ thực thể quá cũ khỏi bộ nhớ đang hoạt động, chuẩn trong xử lý luồng sự kiện (complex event processing).</dd>
+</dl>
+</div>
+</details>
+
+<details class="node">
+<summary>🔗 Nguồn tham khảo</summary>
+<div class="body">
+<p class="pill"><a class="ext" href="https://arxiv.org/abs/2604.03697" target="_blank">SGTA — Scene-Graph Traffic Agent (arXiv 2604.03697)</a></p>
+<p class="pill"><a class="ext" href="https://arxiv.org/abs/2304.04812" target="_blank">Scallop — Neurosymbolic Programming (arXiv 2304.04812)</a></p>
+<p class="pill"><a class="ext" href="https://en.wikipedia.org/wiki/Rete_algorithm" target="_blank">Rete algorithm (Wikipedia)</a></p>
+</div>
+</details>
+
+</main>
+
+<footer>Mind map tổng hợp từ phiên thiết kế kiến trúc — bấm tiêu đề để mở/đóng, bấm thuật ngữ để nhảy tới định nghĩa.</footer>
+
+<script>
+function toggleAll(open){
+  document.querySelectorAll('details').forEach(d=>d.open=open);
+}
+function openToTarget(){
+  var h = location.hash;
+  if(!h) return;
+  var el = document.querySelector(h);
+  if(!el) return;
+  var p = el;
+  while(p){
+    if(p.tagName === 'DETAILS') p.open = true;
+    p = p.parentElement;
+  }
+  setTimeout(function(){ el.scrollIntoView({behavior:'smooth', block:'center'}); }, 50);
+}
+window.addEventListener('hashchange', openToTarget);
+window.addEventListener('DOMContentLoaded', openToTarget);
+</script>
+</body>
+</html>

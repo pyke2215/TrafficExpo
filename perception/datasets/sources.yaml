@@ -1,0 +1,88 @@
+# Nguon hien co. raw/ khong dua vao git.
+# Chi vn-82 dung de train bien. Video trong journeys/ de tu gan nhan.
+
+country: VN
+vehicle_first: xe_may
+
+usable:
+  - id: vn-82
+    head: doc_bien
+    title: Vietnam Traffic Sign Detection, 82 lop, YOLO
+    url: https://huggingface.co/datasets/Minh124689/Traffic-sign-detection-VietNam
+    local: raw/vn-82
+    zip: raw/zips/traffic-sign-detection-vietnam.zip
+    bytes: 905044660
+    license: cc-by-4.0
+    covers: loai bien va gia tri, co cam mo to va gioi han toc do
+    missing: den tin hieu khong co trong bo nay
+
+  - id: roadbuddy
+    head: detect
+    title: Zalo AI Challenge 2025 RoadBuddy, dashcam Viet Nam
+    url: https://huggingface.co/datasets/OpenHay/zalo-ai-2025-training-data-v2
+    local: raw/roadbuddy/frames
+    images: 3843
+    bytes: 3499480073
+    license: cc-by-nc-4.0
+    covers: anh cat tu dashcam Viet Nam, ngay va dem, moi clip 5-15 giay giu 7 khung
+    missing: repo khong co file video; khong co nhan hop hay vach
+
+journeys:
+  - id: hue-motorcycle
+    local: raw/journeys/hue-motorcycle.webm
+    url: https://commons.wikimedia.org/wiki/File:Veturado_sur_motorciklo_apud_Hue.webm
+    bytes: 27787364
+    license: cc-by-sa-4.0
+    credit: RG72, 12 Nov 2013
+    place: gan Hue, Viet Nam
+    view: camera gan xe may, nhin ve phia truoc
+    resolution: 1920x1080
+    duration_s: 68
+    note: hanh trinh that, ngan
+
+  - id: mixkit-25275
+    local: raw/journeys/mixkit-25275-pov-motorcycle.mp4
+    url: https://mixkit.co/free-stock-video/point-of-view-of-riding-a-motorcycle-25275/
+    download: https://assets.mixkit.co/videos/25275/25275-720.mp4
+    bytes: 9272465
+    license: mixkit-stock-video-free
+    license_url: https://mixkit.co/license/#videoFree
+    place: khong phai Viet Nam
+    view: goc nhin nguoi lai
+    resolution: 1280x720
+    fps: 25
+    duration_s: 25
+
+  - id: mixkit-31974
+    local: raw/journeys/mixkit-31974-pov-motorcycle.mp4
+    url: https://mixkit.co/free-stock-video/riding-on-a-motorcycle-first-person-perspective-31974/
+    download: https://assets.mixkit.co/videos/31974/31974-720.mp4
+    bytes: 7849317
+    license: mixkit-stock-video-free
+    license_url: https://mixkit.co/license/#videoFree
+    place: khong phai Viet Nam
+    view: goc nhin nguoi lai
+    resolution: 1280x720
+    fps: 30
+    duration_s: 21
+
+  - id: pexels-19581985
+    local: raw/journeys/pexels-19581985-motorcycle.mp4
+    url: https://www.pexels.com/video/pov-of-a-motorcycle-ride-19581985/
+    download: https://videos.pexels.com/video-files/19581985/19581985-hd_1920_1080_30fps.mp4
+    bytes: 8112521
+    license: pexels
+    license_url: https://www.pexels.com/license/
+    place: duong do thi nang, khong xac nhan Viet Nam
+    view: ngoi sau nguoi lai, nhin ve phia truoc
+    resolution: 1920x1080
+    fps: 30
+    duration_s: 10
+
+removed:
+  - id: via-signs
+    why: 6 lop huong di va cam re, khong du de doc bien
+  - id: via-lane
+    why: mot lop vach, khong tach lien hay dut, vang hay trang
+  - id: hcmc-46
+    why: git chi co code va weight, khong co anh
